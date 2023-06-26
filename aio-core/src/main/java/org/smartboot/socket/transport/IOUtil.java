@@ -23,18 +23,23 @@ final class IOUtil {
      */
     public static void close(AsynchronousSocketChannel channel) {
         boolean connected = true;
+//        第一个try-catch块尝试关闭通道的输入流，如果通道未连接，
+//        则会抛出NotYetConnectedException异常，这时将connected变量设置为false。
         try {
             channel.shutdownInput();
         } catch (IOException ignored) {
         } catch (NotYetConnectedException e) {
             connected = false;
         }
+        //第二个try-catch块尝试关闭通道的输出流，如果通道未连接，
+        // 则同样会抛出NotYetConnectedException异常，这时不需要再次关闭通道的输出流，因此代码中直接忽略该异常即可。
         try {
             if (connected) {
                 channel.shutdownOutput();
             }
         } catch (IOException | NotYetConnectedException ignored) {
         }
+        //第三个try-catch块尝试关闭通道本身，如果通道已经关闭，则会抛出IOException异常，这时可以忽略该异常。
         try {
             channel.close();
         } catch (IOException ignored) {
